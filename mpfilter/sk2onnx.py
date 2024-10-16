@@ -5,6 +5,7 @@ from pathlib import Path
 
 import numpy as np
 import onnxruntime as ort
+from sklearn import svm
 from skl2onnx import to_onnx
 from skl2onnx.common.data_types import FloatTensorType
 
@@ -20,7 +21,9 @@ def main(args: Namespace):
         y_score = clf.decision_function(X)  # type: ignore
     initial_type = [("input", FloatTensorType([None, 3600]))]
     save_to = Path(args.dst)
-    options = {id(clf): {"zipmap": False}}
+    options = {}
+    if not isinstance(clf, svm.LinearSVC):
+        options = {id(clf): {"zipmap": False}}
     onx = to_onnx(
         clf,
         X,

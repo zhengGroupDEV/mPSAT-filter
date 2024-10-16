@@ -15,11 +15,11 @@ import onnx
 import onnxruntime
 import torch
 
-from .config import ConfigAe, ConfigCconv, ConfigConv
+from .config import ConfigAE, ConfigCNN1D, ConfigVCNN
 from .model import (
-    MpModelClsConv,
-    MpModelSeqAe,
-    MpModelSeqConv,
+    MpCNN1D,
+    MpAE,
+    MpVCNN,
 )
 
 
@@ -49,26 +49,26 @@ def to_onnx(ckpt: str, save_to: str, model_name: str):
     device = "cpu"
     providers = ("CPUExecutionProvider",)
     seed_everything(42)
-    if model_name == "cconv":
+    if model_name == "cnn1d":
         # CNN
-        conf = ConfigCconv("config/config_cconv.json")
-        model = MpModelClsConv(
+        conf = ConfigCNN1D("config/config_cnn1d.json")
+        model = MpCNN1D(
             in_features=conf.in_features,
             out_features=conf.num_class,
             dropout=conf.dropout,
         )
         x = torch.randn(1, 3600)
-    elif model_name == "conv":
-        conf = ConfigConv("config/config_conv.json", init=False)
-        model = MpModelSeqConv(
+    elif model_name == "vcnn":
+        conf = ConfigVCNN("config/config_vcnn.json", init=False)
+        model = MpVCNN(
             in_features=conf.in_features,
             out_features=conf.out_features,
             dropout=conf.dropout,
         )
         x = torch.randn(1, 1, 3600)
     elif model_name == "ae":
-        conf = ConfigAe("config/config_ae.json")
-        model = MpModelSeqAe(
+        conf = ConfigAE("config/config_ae.json")
+        model = MpAE(
             in_features=conf.in_features,
             hid_features=conf.hid_features,
             out_features=conf.out_features,
@@ -139,7 +139,7 @@ def main(args: Namespace):
             ckpt_name = p.name.replace(".ckpt", ".onnx")
         dst_path = dst / ckpt_name
 
-        to_onnx(ckpt=src_path, save_to=str(dst_path), model_name="cconv")
+        to_onnx(ckpt=src_path, save_to=str(dst_path), model_name="cnn1d")
 
 
 if __name__ == "__main__":

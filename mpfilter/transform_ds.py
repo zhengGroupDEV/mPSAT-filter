@@ -12,7 +12,7 @@ import pandas as pd
 from numpy.typing import NDArray
 from tqdm import tqdm
 
-from .inferer import InferSeqAe, InferSeqBase, InferSeqConv
+from .inferer import InferAE, InferSeqBase, InferVCNN
 
 
 class Dataset(object):
@@ -71,9 +71,9 @@ class DataLoader(object):
 
 def main(args: Namespace):
     if args.model == "ae":
-        inferer = InferSeqAe(args.model_path, device=args.device)
+        inferer = InferAE(args.model_path, device=args.device)
     else:
-        inferer = InferSeqConv(args.model_path, device=args.device)
+        inferer = InferVCNN(args.model_path, device=args.device)
     if not Path(args.dst_ds).exists():
         Path(args.dst_ds).mkdir(parents=True)
 
@@ -105,7 +105,7 @@ if __name__ == "__main__":
         dest="model",
         type=str,
         required=True,
-        choices=["ae", "conv"],
+        choices=["ae", "vcnn"],
     )
     parser.add_argument(
         "--device",

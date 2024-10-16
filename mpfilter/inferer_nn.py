@@ -1,8 +1,8 @@
 import torch
 import torch.nn as nn
 
-from .config import ConfigAe, ConfigConv
-from .model import MpModelSeqAe, MpModelSeqConv
+from .config import ConfigAE, ConfigVCNN
+from .model import MpAE, MpVCNN
 
 
 class InferNN(nn.Module):
@@ -11,16 +11,16 @@ class InferNN(nn.Module):
     ) -> None:
         super().__init__()
         if model_name == "ae":
-            self.conf = ConfigAe(conf_path, init=False)
-            self.filter = MpModelSeqAe(
+            self.conf = ConfigAE(conf_path, init=False)
+            self.filter = MpAE(
                 in_features=self.conf.in_features,
                 out_features=self.conf.out_features,
                 hid_features=self.conf.hid_features,
                 dropout=self.conf.dropout,
             )
-        elif model_name == "conv":
-            self.conf = ConfigConv(conf_path, init=False)
-            self.filter = MpModelSeqConv(
+        elif model_name == "vcnn":
+            self.conf = ConfigVCNN(conf_path, init=False)
+            self.filter = MpVCNN(
                 in_features=self.conf.in_features,
                 out_features=self.conf.out_features,
                 dropout=self.conf.dropout,

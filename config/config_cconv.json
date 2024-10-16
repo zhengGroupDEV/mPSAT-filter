@@ -1,9 +1,0 @@
-{
-    "in_features": 1,
-    "num_class": 25,
-    "dropout": 0.1,
-    "num_tokens": 1000,
-    "seq_len": 3600,
-    "batch_size": 256,
-    "reserve": 3
-}

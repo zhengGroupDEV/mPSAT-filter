@@ -1,0 +1,11 @@
+bak/
+data/dataset/
+__pycache__/
+scripts/
+.vscode/
+# .ftr
+logs/
+ckpts/
+convert/
+.pdm-python
+.venv/

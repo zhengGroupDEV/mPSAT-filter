@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Dict, List, Union
 
 
-__supported_models__ = ("ae", "conv", "cconv")
+__supported_models__ = ("ae", "vcnn", "cnn1d")
 __supported_device__ = ("cpu", "cuda")
 
 
@@ -40,7 +40,7 @@ class ConfigBase(object):
             json.dump(d, f, indent=4)
 
 
-class ConfigCconv(ConfigBase):
+class ConfigCNN1D(ConfigBase):
     in_features: int = 1
     num_class: int = 25
     # common
@@ -50,7 +50,7 @@ class ConfigCconv(ConfigBase):
     seq_len: int = 3600
     reserve: int = 3
 
-    def __init__(self, path: str, model: str = "conv", init=True) -> None:
+    def __init__(self, path: str, model: str = "cnn1d", init=True) -> None:
         super().__init__(path, model)
         if init:
             self.save_init()
@@ -72,7 +72,7 @@ class ConfigCconv(ConfigBase):
         return d
 
 
-class ConfigConv(ConfigBase):
+class ConfigVCNN(ConfigBase):
     in_features: int = 1
     out_features: int = 3600
     # common
@@ -82,7 +82,7 @@ class ConfigConv(ConfigBase):
     seq_len: int = 3600
     reserve: int = 3
 
-    def __init__(self, path: str, model: str = "conv", init=True) -> None:
+    def __init__(self, path: str, model: str = "vcnn", init=True) -> None:
         super().__init__(path, model)
         if init:
             self.save_init()
@@ -104,7 +104,7 @@ class ConfigConv(ConfigBase):
         return d
 
 
-class ConfigAe(ConfigBase):
+class ConfigAE(ConfigBase):
     in_features: int = 3600
     hid_features: int = 128
     out_features: int = 3600

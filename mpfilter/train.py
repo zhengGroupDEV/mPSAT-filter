@@ -18,9 +18,9 @@ from torch.utils.data import DataLoader
 
 # from .arghint import ArgsTrain
 from .config import (
-    ConfigAe,
-    ConfigCconv,
-    ConfigConv,
+    ConfigAE,
+    ConfigCNN1D,
+    ConfigVCNN,
     __supported_device__,
     __supported_models__,
 )
@@ -30,7 +30,7 @@ from .dataset import MpDatasetCls, MpDatasetSeq
 from .inferer_nn import InferNN
 from .model_pl import (
     MpModelAeLight,
-    MpModelCconvLight,
+    MpModelCNN1DLight,
     MpModelConvLight,
     MpSaveCkptOnShutdown,
 )
@@ -45,7 +45,7 @@ def load_data_set(
 ) -> DataLoader:
     model = args.model
     assert model in __supported_models__
-    if model in ("ae", "conv"):
+    if model in ("ae", "vcnn"):
         loader = DataLoader(
             dataset=MpDatasetSeq(
                 path=path,
@@ -59,7 +59,7 @@ def load_data_set(
             pin_memory=True,
             # collate_fn=collate_fn_seq,
         )
-    elif model in ("cconv",):
+    elif model in ("cnn1d",):
         ds_transform = None
         if args.transform:
             assert (
@@ -94,7 +94,7 @@ def get_model_conf(args: Namespace):
     # config
     init = args.overwrite_config
     if args.model == "ae":
-        conf = ConfigAe(args.conf, model=args.model, init=init)
+        conf = ConfigAE(args.conf, model=args.model, init=init)
         model = MpModelAeLight(
             conf=conf,
             optimizer=args.optim,
@@ -103,8 +103,8 @@ def get_model_conf(args: Namespace):
             sc_gamma=args.sc_gamma,
             warmup_step=args.warmup,
         )
-    elif args.model == "conv":
-        conf = ConfigConv(args.conf, model=args.model, init=init)
+    elif args.model == "vcnn":
+        conf = ConfigVCNN(args.conf, model=args.model, init=init)
         model = MpModelConvLight(
             conf=conf,
             optimizer=args.optim,
@@ -113,9 +113,9 @@ def get_model_conf(args: Namespace):
             sc_gamma=args.sc_gamma,
             warmup_step=args.warmup,
         )
-    elif args.model == "cconv":
-        conf = ConfigCconv(args.conf, model=args.model, init=init)
-        model = MpModelCconvLight(
+    elif args.model == "cnn1d":
+        conf = ConfigCNN1D(args.conf, model=args.model, init=init)
+        model = MpModelCNN1DLight(
             conf=conf,
             optimizer=args.optim,
             lr=args.lr,

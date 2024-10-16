@@ -289,7 +289,7 @@ if __name__ == "__main__":
                 if rep == "repeat":
                     args.dst = "repeat2"
                     main(args, path_ptn=rf"clf_{args.model_name}_0.2.pkl")
-                ########### AE+CONV+02 ####################
+                ########### AE+VCNN+02 ####################
                 else:
                     args.dst = "repeat1"
-                    main(args, path_ptn=r"02\+ae\+conv.pkl")
+                    main(args, path_ptn=r"02\+ae\+vcnn.pkl")

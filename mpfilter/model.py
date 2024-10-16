@@ -8,7 +8,7 @@ import torch.nn as nn
 #######################################
 ######## Reconstruction  #############
 ######################################
-class MpModelSeqAe(nn.Module):
+class MpAE(nn.Module):
     def __init__(
         self,
         in_features: int = 3600,
@@ -48,7 +48,7 @@ class MpModelSeqAe(nn.Module):
         ...
 
     def forward(self, x: torch.Tensor):
-        # x: (B, 1, N), competible with MpModelSeqConv
+        # x: (B, 1, N), competible with MpVCNN
         x = self.encoder(x.squeeze(1))
         # (B, H)
         x = self.decoder(x)
@@ -56,7 +56,7 @@ class MpModelSeqAe(nn.Module):
         return x
 
 
-class MpModelSeqConv(nn.Module):
+class MpVCNN(nn.Module):
     def __init__(
         self,
         in_features: int = 1,
@@ -64,7 +64,7 @@ class MpModelSeqConv(nn.Module):
         dropout: float = 0.1,
         norm_eps: float = 1e-6,
     ) -> None:
-        super(MpModelSeqConv, self).__init__()
+        super(MpVCNN, self).__init__()
 
         self.encoder = nn.Sequential(
             nn.Conv1d(in_features, 4, 11, stride=7),
@@ -114,7 +114,7 @@ class MpModelSeqConv(nn.Module):
 #######################################
 ######## Classification  #############
 ######################################
-class MpModelClsConv(nn.Module):
+class MpCNN1D(nn.Module):
     def __init__(
         self,
         in_features: int = 1,
@@ -122,7 +122,7 @@ class MpModelClsConv(nn.Module):
         dropout: float = 0.1,
         norm_eps: float = 1e-6,
     ) -> None:
-        super(MpModelClsConv, self).__init__()
+        super(MpCNN1D, self).__init__()
 
         self.encoder = nn.Sequential(
             nn.Conv1d(in_features, 4, 11, stride=7),

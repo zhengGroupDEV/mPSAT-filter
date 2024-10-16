@@ -6,7 +6,7 @@ Microplastics (MPs) spectral reconstruction and identification using machine lea
 
 1. install python-poetry
 2. `git clone https://github.com/zhengGroupDEV/mPSAT-filter.git`, `cd mPSAT-filter`
-3. run `poetry install`, `poetry shell`
+3. install dependencies, run `pdm install` and activate your virtual environment
 4. generate dataset `python -m mpfilter.ds_generate -i data/ds_mpc_mpb_24.ftr -o data/dataset/ds_1k_0.2`
 5. train or evaluate using powershell scripts in `scripts`, e.g., to train reconstruction model AE `./scripts/train_seq.ps1 -model ae`, you can change configuration in script and config file.
 

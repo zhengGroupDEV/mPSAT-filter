@@ -4,8 +4,9 @@ Author: Rainyl
 Date: 2022-09-29 21:47:42
 LastEditTime: 2023-01-24 10:20:19
 """
+
 from argparse import ArgumentParser
-from typing import Union
+from typing import Tuple, Union
 
 import numpy as np
 from numpy.typing import NDArray
@@ -26,6 +27,7 @@ class InferBase(object):
         ),
         ("CPUExecutionProvider",),
     ]
+    _xx = np.arange(400, 4000, 1, dtype=np.float32)
 
     def __init__(
         self,
@@ -52,6 +54,27 @@ class InferBase(object):
         )
         return model
 
+    def minmax(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
+        return (x - x.min()) / (x.max() - x.min())
+
+    def interpolate(
+        self,
+        xp: NDArray[np.float32],
+        fp: NDArray[np.float32],
+        x: Union[NDArray[np.float32], None] = None,
+        left: float = 0,
+        right: float = 0,
+    ) -> Tuple[NDArray[np.float32], NDArray[np.float32]]:
+        assert xp.size == fp.size
+        xp = np.sort(xp)
+        # x should be 2D (B, N)
+        # minmax
+        fp1 = self.minmax(fp)
+        # interpolate
+        x = x or np.arange(400, 4000, 1, dtype=np.float32)
+        yy = np.interp(x, xp, fp1, left=left, right=right)
+        return (x, yy.astype(np.float32))
+
     def __call__(self, x: NDArray[np.float32]):
         raise NotImplementedError()
 
@@ -61,7 +84,7 @@ class InferClsBase(InferBase):
         self,
         model_path: str,
         conf_path: Union[str, None] = None,
-        model_name: str = "cconv",
+        model_name: str = "cnn1d",
         device: str = "cpu",
     ) -> None:
         super().__init__(model_path, conf_path, device)
@@ -70,12 +93,13 @@ class InferClsBase(InferBase):
         self.model: InferenceSession = self.load_model()
 
     def __call__(self, x: NDArray[np.float32]) -> NDArray[np.float32]:
+        # x should be (B, 3600) or (3600)
         assert x.ndim in (1, 2), f"the dimension of input is [{x.ndim}], not supported"
         if x.ndim == 1:
             x = np.expand_dims(x, 0)
         inputs = {self.model.get_inputs()[0].name: x}
         out = self.model.run(None, inputs)
-        if self.model_name == "cconv":
+        if self.model_name == "cnn1d":
             out = out[0]
         else:
             out = out[1]
@@ -94,6 +118,7 @@ class InferSeqBase(InferBase):
         self.model: InferenceSession = self.load_model()
 
     def __call__(self, x: NDArray[np.float32]):
+        # x should be (B, 3600) or (B, 1, 3600)
         assert x.ndim in (2, 3), f"the dimension of input is [{x.ndim}], not supported"
         if x.ndim == 2:
             x = np.expand_dims(x, 1)
@@ -103,7 +128,7 @@ class InferSeqBase(InferBase):
         return out
 
 
-class InferSeqConv(InferSeqBase):
+class InferVCNN(InferSeqBase):
     def __init__(
         self,
         model_path: str,
@@ -113,7 +138,7 @@ class InferSeqConv(InferSeqBase):
         super().__init__(conf_path=conf_path, model_path=model_path, device=device)
 
 
-class InferSeqAe(InferSeqBase):
+class InferAE(InferSeqBase):
     def __init__(
         self,
         model_path: str,
@@ -124,7 +149,7 @@ class InferSeqAe(InferSeqBase):
 
 
 def infer_seq(x: NDArray[np.float32], device="cuda"):
-    inferer = InferSeqAe(
+    inferer = InferAE(
         "convert/ae/mp=-seed=0-epoch=48-step=1700-val_loss=0.001.onnx",
         device=device,
     )
@@ -134,7 +159,7 @@ def infer_seq(x: NDArray[np.float32], device="cuda"):
 
 def infer_cls(x: NDArray[np.float32], device="cpu"):
     inferer = InferClsBase(
-        model_path="convert/cconv/0_0.2.onnx",
+        model_path="convert/cnn1d/0_0.2.onnx",
         device=device,
     )
     out = inferer(x)

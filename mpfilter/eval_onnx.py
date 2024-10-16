@@ -89,7 +89,7 @@ if __name__ == "__main__":
     args = parser.parse_args(
         [
             "-s",
-            "convert/cconv",
+            "convert/cnn1d",
             "-d",
             "repeat1",
             # "repeat2",
@@ -122,5 +122,5 @@ if __name__ == "__main__":
                 ########### 02 only #######################
                 main(args, path_ptn=r"\d{1,4}_" + f"{0.2}.onnx")
             else:
-                ########### AE+CONV+02 ####################
-                main(args, path_ptn=r"\d{1,4}_" + r"02\+ae\+conv.onnx")
+                ########### AE+VCNN+02 ####################
+                main(args, path_ptn=r"\d{1,4}_" + r"02\+ae\+vcnn.onnx")

@@ -17,15 +17,15 @@ from pytorch_lightning.callbacks import Callback
 from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix
 
 from .config import (
-    ConfigAe,
+    ConfigAE,
     ConfigBase,
-    ConfigCconv,
-    ConfigConv,
+    ConfigCNN1D,
+    ConfigVCNN,
 )
 from .model import (
-    MpModelClsConv,
-    MpModelSeqAe,
-    MpModelSeqConv,
+    MpCNN1D,
+    MpAE,
+    MpVCNN,
 )
 
 matplotlib.use("Agg")
@@ -121,8 +121,8 @@ class MpModelBaseLight(pl.LightningModule):
 class MpModelClsLight(MpModelBaseLight):
     def __init__(
         self,
-        conf: ConfigCconv,
-        model: MpModelClsConv,
+        conf: ConfigCNN1D,
+        model: MpCNN1D,
         optimizer: str = "adam",
         lr: float = 1e-4,
         sc_step: int = 100,
@@ -305,17 +305,17 @@ class MpModelClsLight(MpModelBaseLight):
         tb.add_figure(tag, fig, self.trainer.global_step, close=True)
 
 
-class MpModelCconvLight(MpModelClsLight):
+class MpModelCNN1DLight(MpModelClsLight):
     def __init__(
         self,
-        conf: ConfigCconv,
+        conf: ConfigCNN1D,
         optimizer: str = "adam",
         lr: float = 0.0001,
         sc_step: int = 100,
         sc_gamma: float = 0.5,
         warmup_step: int = 1,
     ) -> None:
-        model = MpModelClsConv(
+        model = MpCNN1D(
             in_features=conf.in_features,
             out_features=conf.num_class,
             dropout=conf.dropout,
@@ -338,7 +338,7 @@ class MpModelSeqLight(MpModelBaseLight):
     def __init__(
         self,
         conf: ConfigBase,
-        model: Union[MpModelSeqAe, MpModelSeqConv],
+        model: Union[MpAE, MpVCNN],
         optimizer: str = "adam",
         lr: float = 1e-4,
         sc_step: int = 100,
@@ -453,14 +453,14 @@ class MpModelSeqLight(MpModelBaseLight):
 class MpModelConvLight(MpModelSeqLight):
     def __init__(
         self,
-        conf: ConfigConv,
+        conf: ConfigVCNN,
         optimizer: str = "adam",
         lr: float = 0.0001,
         sc_step: int = 100,
         sc_gamma: float = 0.5,
         warmup_step: int = 1,
     ):
-        model = MpModelSeqConv(
+        model = MpVCNN(
             in_features=conf.in_features,
             out_features=conf.out_features,
             dropout=conf.dropout,
@@ -471,14 +471,14 @@ class MpModelConvLight(MpModelSeqLight):
 class MpModelAeLight(MpModelSeqLight):
     def __init__(
         self,
-        conf: ConfigAe,
+        conf: ConfigAE,
         optimizer: str = "adam",
         lr: float = 0.0001,
         sc_step: int = 100,
         sc_gamma: float = 0.5,
         warmup_step: int = 1,
     ):
-        model = MpModelSeqAe(
+        model = MpAE(
             in_features=conf.in_features,
             out_features=conf.out_features,
             hid_features=conf.hid_features,
